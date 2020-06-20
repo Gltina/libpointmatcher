@@ -235,6 +235,12 @@ void InspectorsImpl<T>::AbstractVTKInspector::dumpDataPoints(const DataPoints& d
 }
 
 template<typename T>
+void InspectorsImpl<T>::AbstractVTKInspector::dumpMatrix(const TransformationParameters & parameters, std::ostream & stream)
+{
+	stream << parameters << std::endl;
+}
+
+template<typename T>
 void InspectorsImpl<T>::AbstractVTKInspector::dumpMeshNodes(const DataPoints& data, std::ostream& stream)
 {
 	//const Matrix& features(data.features);
@@ -399,8 +405,12 @@ void InspectorsImpl<T>::AbstractVTKInspector::dumpIteration(
 	}
 	
 	if (bDumpReading){
-		ostream* streamRead(openStream("reading", iterationNumber));
-		dumpDataPoints(reading, *streamRead);
+		//ostream* streamRead(openStream("reading", iterationNumber));
+		//dumpDataPoints(reading, *streamRead);
+		//closeStream(streamRead);
+		ostream* streamRead(openStream("matrix", iterationNumber, ".txt"));
+		//dumpDataPoints(reading, *streamRead);
+		dumpMatrix(parameters, *streamRead);
 		closeStream(streamRead);
 	}
 	
@@ -768,10 +778,10 @@ std::ostream* InspectorsImpl<T>::VTKFileInspector::openStream(const std::string&
 }
 
 template<typename T>
-std::ostream* InspectorsImpl<T>::VTKFileInspector::openStream(const std::string& role, const size_t iterationNumber)
+std::ostream* InspectorsImpl<T>::VTKFileInspector::openStream(const std::string& role, const size_t iterationNumber, const std::string & postfix)
 {
 	ostringstream oss;
-	oss << baseFileName << "-" << role << "-" << iterationNumber << ".vtk";
+	oss << baseFileName << "-" << role << "-" << iterationNumber << postfix;
 	ofstream* file = new ofstream(oss.str().c_str());
 	if (file->fail())
 		throw std::runtime_error("Couldn't open the file \"" + oss.str() + "\". Check if directory exist.");

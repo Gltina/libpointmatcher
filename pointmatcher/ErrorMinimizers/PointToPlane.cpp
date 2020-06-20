@@ -53,55 +53,17 @@ typedef Parametrizable::ParametersDoc ParametersDoc;
 template<typename T>
 PointToPlaneErrorMinimizer<T>::PointToPlaneErrorMinimizer(const Parameters& params):
 	ErrorMinimizer(name(), availableParameters(), params),
-	force2D(Parametrizable::get<T>("force2D")),
-    force4DOF(Parametrizable::get<T>("force4DOF"))
+	force2D(Parametrizable::get<T>("force2D"))
 {
-	if(force2D)
-		{
-			if (force4DOF)
-			{
-				throw PointMatcherSupport::ConfigurationError("Force 2D cannot be used together with force4DOF.");
-			}
-			else
-			{
-				LOG_INFO_STREAM("PointMatcher::PointToPlaneErrorMinimizer - minimization will be in 2D.");
-			}
-		}
-	else if(force4DOF)
-	{
-	 	LOG_INFO_STREAM("PointMatcher::PointToPlaneErrorMinimizer - minimization will be in 4-DOF (yaw,x,y,z).");
-	}
-	else
-	{
-		LOG_INFO_STREAM("PointMatcher::PointToPlaneErrorMinimizer - minimization will be in 3D.");
-	}
+	LOG_INFO_STREAM("PointMatcher::PointToPlaneErrorMinimizer - minimization will be in 2D.");
 }
 
 template<typename T>
 PointToPlaneErrorMinimizer<T>::PointToPlaneErrorMinimizer(const ParametersDoc paramsDoc, const Parameters& params):
 	ErrorMinimizer(name(), paramsDoc, params),
-	force2D(Parametrizable::get<T>("force2D")),
-	force4DOF(Parametrizable::get<T>("force4DOF"))
+	force2D(Parametrizable::get<T>("force2D"))
 {
-	if(force2D)
-	{
-		if (force4DOF)
-		{
-			throw PointMatcherSupport::ConfigurationError("Force 2D cannot be used together with force4DOF.");
-		}
-		else
-		{
-			LOG_INFO_STREAM("PointMatcher::PointToPlaneErrorMinimizer - minimization will be in 2D.");
-		}
-	}
-	else if(force4DOF)
-	{
-		LOG_INFO_STREAM("PointMatcher::PointToPlaneErrorMinimizer - minimization will be in 4-DOF (yaw,x,y,z).");
-	}
-	else
-	{
-		LOG_INFO_STREAM("PointMatcher::PointToPlaneErrorMinimizer - minimization will be in 3D.");
-	}
+	LOG_INFO_STREAM("PointMatcher::PointToPlaneErrorMinimizer - minimization will be in 2D.");
 }
 
 
@@ -192,23 +154,7 @@ typename PointMatcher<T>::TransformationParameters PointToPlaneErrorMinimizer<T>
 		assert(normalRef.rows() > 0);
 
 		// Compute cross product of cross = cross(reading X normalRef)
-		Matrix cross;
-		Matrix matrixGamma(3,3);
-		if(!force4DOF)
-		{
-			// Compute cross product of cross = cross(reading X normalRef)
-			cross = this->crossProduct(mPts.reading.features, normalRef);
-		}
-		else
-		{
-		   	//VK: Instead for "cross" as in 3D, we need only a dot product with the matrixGamma factor for 4DOF
-		   	//VK: This should be published in 2020 or 2021
-			matrixGamma << 0,-1, 0,
-			         1, 0, 0,
-			         0, 0, 0;
-			cross = ((matrixGamma*mPts.reading.features).transpose()*normalRef).diagonal().transpose();
-		}
-
+		const Matrix cross = this->crossProduct(mPts.reading.features, normalRef);
 
 		// wF = [weights*cross, weights*normals]
 		// F  = [cross, normals]
@@ -257,30 +203,14 @@ typename PointMatcher<T>::TransformationParameters PointToPlaneErrorMinimizer<T>
 				 * Eigen::AngleAxis<T>(x(1), Eigen::Matrix<T,1,3>::UnitY())
 				 * Eigen::AngleAxis<T>(x(2), Eigen::Matrix<T,1,3>::UnitZ());*/
 
-				// Normal 6DOF takes the whole rotation vector from the solution to construct the output quaternion
-				if (!force4DOF)
-				{
-					transform = Eigen::AngleAxis<T>(x.head(3).norm(), x.head(3).normalized()); //x=[alpha,beta,gamma,x,y,z]
-				} else  // 4DOF needs only one number, the rotation around the Z axis
-				{
-					Vector unitZ(3,1);
-					unitZ << 0,0,1;
-					transform = Eigen::AngleAxis<T>(x(0), unitZ);   //x=[gamma,x,y,z]
-				}
+				transform = Eigen::AngleAxis<T>(x.head(3).norm(),x.head(3).normalized());
 
 				// Reverse roll-pitch-yaw conversion, very useful piece of knowledge, keep it with you all time!
 				/*const T pitch = -asin(transform(2,0));
 					const T roll = atan2(transform(2,1), transform(2,2));
 					const T yaw = atan2(transform(1,0) / cos(pitch), transform(0,0) / cos(pitch));
 					std::cerr << "d angles" << x(0) - roll << ", " << x(1) - pitch << "," << x(2) - yaw << std::endl;*/
-				if (!force4DOF)
-				{
-					transform.translation() = x.segment(3, 3);  //x=[alpha,beta,gamma,x,y,z]
-				} else
-				{
-					transform.translation() = x.segment(1, 3);  //x=[gamma,x,y,z]
-				}
-
+				transform.translation() = x.segment(3, 3);
 				mOut = transform.matrix();
 
 				if (mOut != mOut)

@@ -109,9 +109,10 @@ struct InspectorsImpl
 
 	protected:
 		virtual std::ostream* openStream(const std::string& role) = 0;
-		virtual std::ostream* openStream(const std::string& role, const size_t iterationNumber) = 0;
+		virtual std::ostream* openStream(const std::string& role, const size_t iterationCount, const std::string & postfix = ".vtk") = 0;
 		virtual void closeStream(std::ostream* stream) = 0;
 		void dumpDataPoints(const DataPoints& data, std::ostream& stream);
+		void dumpMatrix(const TransformationParameters& parameters, std::ostream& stream);
 		void dumpMeshNodes(const DataPoints& data, std::ostream& stream);
 		void dumpDataLinks(const DataPoints& ref, const DataPoints& reading, 	const Matches& matches, const OutlierWeights& featureOutlierWeights, std::ostream& stream);
 		
@@ -183,7 +184,7 @@ struct InspectorsImpl
 		
 	protected:
 		virtual std::ostream* openStream(const std::string& role);
-		virtual std::ostream* openStream(const std::string& role, const size_t iterationCount);
+		virtual std::ostream* openStream(const std::string& role, const size_t iterationCount, const std::string & postfix = ".vtk");
 		virtual void closeStream(std::ostream* stream);
 		
 	public:

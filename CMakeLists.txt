@@ -435,15 +435,9 @@ endif(GENERATE_API_DOC)
 add_subdirectory(examples)
 # Evaluation programs
 add_subdirectory(evaluations)
-
 # Unit testing
+add_subdirectory(utest)
 
-option(BUILD_TESTS "Build all tests." OFF)
-
-if (BUILD_TESTS)
-	enable_testing()
-	add_subdirectory(utest)
-endif()
 
 #=================== allow find_package() =========================
 #

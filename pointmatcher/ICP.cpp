@@ -400,10 +400,13 @@ typename PointMatcher<T>::TransformationParameters PointMatcher<T>::ICP::compute
 		
 		//-----------------------------
 		// Dump
-		this->inspector->dumpIteration(
-			iterationCount, T_iter, reference, stepReading, matches, outlierWeights, this->transformationCheckers
-		);
+		//this->inspector->dumpIteration(
+		//	iterationCount, T_iter, reference, stepReading, matches, outlierWeights, this->transformationCheckers
+		//);
 		
+		this->inspector->dumpIteration(
+			iterationCount, T_refIn_refMean * T_iter * T_refMean_dataIn, reference, stepReading, matches, outlierWeights, this->transformationCheckers
+		);
 		//-----------------------------
 		// Error minimization
 		// equivalent to: 
@@ -514,28 +517,6 @@ void PointMatcher<T>::ICPSequence::clearMap()
 	const int dim(mapPointCloud.features.rows());
 	T_refIn_refMean = Matrix::Identity(dim, dim);
 	mapPointCloud = DataPoints();
-}
-
-template<typename T>
-void PointMatcher<T>::ICPSequence::setDefault()
-{
-	ICPChainBase::setDefault();
-	
-	if(mapPointCloud.getNbPoints() > 0)
-	{
-		this->matcher->init(mapPointCloud);
-	}
-}
-
-template<typename T>
-void PointMatcher<T>::ICPSequence::loadFromYaml(std::istream& in)
-{
-	ICPChainBase::loadFromYaml(in);
-	
-	if(mapPointCloud.getNbPoints() > 0)
-	{
-		this->matcher->init(mapPointCloud);
-	}
 }
 
 //! Return the map, in global coordinates (slow)
