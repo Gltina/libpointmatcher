@@ -112,7 +112,7 @@ struct InspectorsImpl
 		virtual std::ostream* openStream(const std::string& role, const size_t iterationCount, const std::string & postfix = ".vtk") = 0;
 		virtual void closeStream(std::ostream* stream) = 0;
 		void dumpDataPoints(const DataPoints& data, std::ostream& stream);
-		void dumpMatrix(const TransformationParameters& parameters, std::ostream& stream);
+		//void dumpMatrix(const TransformationParameters& parameters, std::ostream& stream);
 		void dumpMeshNodes(const DataPoints& data, std::ostream& stream);
 		void dumpDataLinks(const DataPoints& ref, const DataPoints& reading, 	const Matches& matches, const OutlierWeights& featureOutlierWeights, std::ostream& stream);
 		
@@ -128,10 +128,15 @@ struct InspectorsImpl
 		virtual void init() {};
 		virtual void dumpDataPoints(const DataPoints& cloud, const std::string& name);
 		virtual void dumpMeshNodes(const DataPoints& cloud, const std::string& name);
-		virtual void dumpIteration(const size_t iterationNumber, const TransformationParameters& parameters, const DataPoints& filteredReference, const DataPoints& reading, const Matches& matches, const OutlierWeights& outlierWeights, const TransformationCheckers& transformationCheckers);
+		virtual void dumpIteration(
+			const size_t iterationNumber, const TransformationParameters& parameters, const DataPoints& filteredReference,
+			const DataPoints& reading, const Matches& matches, const OutlierWeights& outlierWeights, const TransformationCheckers& transformationCheckers);
+		virtual void dumpMatrix(std::vector<TransformationParameters> & m_v);
 		virtual void finish(const size_t iterationCount);
 
 	private:
+		std::ostream* openStream_for_dumpMatrix(const std::string& file_name);
+
 		void buildGenericAttributeStream(std::ostream& stream, const std::string& attribute, const std::string& nameTag, const DataPoints& cloud, const int forcedDim);
 
 		void buildScalarStream(std::ostream& stream, const std::string& name, const DataPoints& ref, const DataPoints& reading);

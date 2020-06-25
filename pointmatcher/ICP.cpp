@@ -367,6 +367,8 @@ typename PointMatcher<T>::TransformationParameters PointMatcher<T>::ICP::compute
 	this->prefilteredReadingPtsCount = reading.features.cols();
 	t.restart();
 	
+	std::vector<TransformationParameters> iterative_matrix_vec;
+
 	// iterations
 	while (iterate)
 	{
@@ -405,8 +407,10 @@ typename PointMatcher<T>::TransformationParameters PointMatcher<T>::ICP::compute
 		//);
 		
 		this->inspector->dumpIteration(
-			iterationCount, T_refIn_refMean * T_iter * T_refMean_dataIn, reference, stepReading, matches, outlierWeights, this->transformationCheckers
-		);
+			iterationCount, T_iter, reference, stepReading, matches, outlierWeights, this->transformationCheckers);
+
+		iterative_matrix_vec.push_back(T_refIn_refMean * T_iter * T_refMean_dataIn);
+
 		//-----------------------------
 		// Error minimization
 		// equivalent to: 
@@ -431,6 +435,8 @@ typename PointMatcher<T>::TransformationParameters PointMatcher<T>::ICP::compute
 	
 		++iterationCount;
 	}
+
+	this->inspector->dumpMatrix(iterative_matrix_vec);
 	
 	this->inspector->addStat("IterationsCount", iterationCount);
 	this->inspector->addStat("PointCountTouched", this->matcher->getVisitCount());

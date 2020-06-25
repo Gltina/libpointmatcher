@@ -78,8 +78,16 @@ void PointMatcher<T>::Inspector::dumpStatsHeader(std::ostream& stream)
 
 //! Dump the state of a given iteration
 template<typename T>
-void PointMatcher<T>::Inspector::dumpIteration(const size_t iterationNumber, const TransformationParameters& parameters, const DataPoints& filteredReference, const DataPoints& reading, const Matches& matches, const OutlierWeights& outlierWeights, const TransformationCheckers& transformationCheckers)
+void PointMatcher<T>::Inspector::dumpIteration(
+	const size_t iterationNumber, const TransformationParameters& parameters, const DataPoints& filteredReference,
+	const DataPoints& reading, const Matches& matches, const OutlierWeights& outlierWeights, const TransformationCheckers& transformationCheckers)
 {}
+
+template<typename T>
+void PointMatcher<T>::Inspector::dumpMatrix(std::vector<TransformationParameters> & m_v)
+{
+
+}
 
 //! Tell the inspector the ICP operation is completed
 template<typename T>

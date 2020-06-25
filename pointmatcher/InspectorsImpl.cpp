@@ -234,11 +234,11 @@ void InspectorsImpl<T>::AbstractVTKInspector::dumpDataPoints(const DataPoints& d
 
 }
 
-template<typename T>
-void InspectorsImpl<T>::AbstractVTKInspector::dumpMatrix(const TransformationParameters & parameters, std::ostream & stream)
-{
-	stream << parameters << std::endl;
-}
+//template<typename T>
+//void InspectorsImpl<T>::AbstractVTKInspector::dumpMatrix(const TransformationParameters & parameters, std::ostream & stream)
+//{
+//	stream << parameters << std::endl;
+//}
 
 template<typename T>
 void InspectorsImpl<T>::AbstractVTKInspector::dumpMeshNodes(const DataPoints& data, std::ostream& stream)
@@ -395,7 +395,8 @@ void InspectorsImpl<T>::AbstractVTKInspector::dumpIteration(
 	const DataPoints& reading,
 	const Matches& matches,
 	const OutlierWeights& outlierWeights, 
-	const TransformationCheckers& transCheck)
+	const TransformationCheckers& transCheck
+	)
 {
 
 	if (bDumpDataLinks){
@@ -405,13 +406,14 @@ void InspectorsImpl<T>::AbstractVTKInspector::dumpIteration(
 	}
 	
 	if (bDumpReading){
+		//std::cerr << "[Note] Reading was removed" << std::endl;
 		//ostream* streamRead(openStream("reading", iterationNumber));
 		//dumpDataPoints(reading, *streamRead);
 		//closeStream(streamRead);
-		ostream* streamRead(openStream("matrix", iterationNumber, ".txt"));
+		//ostream* streamRead(openStream("matrix", iterationNumber, ".txt"));
 		//dumpDataPoints(reading, *streamRead);
-		dumpMatrix(parameters, *streamRead);
-		closeStream(streamRead);
+		//dumpMatrix(parameters, *streamRead);
+		//closeStream(streamRead);
 	}
 	
 	if (bDumpReference){
@@ -457,6 +459,33 @@ void InspectorsImpl<T>::AbstractVTKInspector::dumpIteration(
 	}
 
 	*streamIter << "\n";
+}
+
+template<typename T>
+void InspectorsImpl<T>::AbstractVTKInspector::dumpMatrix(std::vector<TransformationParameters>& m_v)
+{
+	if (bDumpReading)
+	{
+		ostream* streamRead(openStream_for_dumpMatrix("fine_matrix.txt"));
+		for (size_t i = 0; i < m_v.size(); ++i)
+		{
+			*streamRead << m_v[i];
+
+			*streamRead << "\n#\n";
+		}
+		closeStream(streamRead);
+	}
+}
+
+template<typename T>
+std::ostream * InspectorsImpl<T>::AbstractVTKInspector::openStream_for_dumpMatrix(const std::string & file_name)
+{
+	ostringstream oss;
+	oss << baseFileName << file_name;
+	ofstream* file = new ofstream(oss.str().c_str());
+	if (file->fail())
+		throw std::runtime_error("Couldn't open the file \"" + oss.str() + "\". Check if directory exist.");
+	return file;
 }
 
 template<typename T>

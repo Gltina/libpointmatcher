@@ -626,7 +626,12 @@ struct PointMatcher
 		virtual void dumpStatsHeader(std::ostream& stream);
 		
 		// data statistics 
-		virtual void dumpIteration(const size_t iterationNumber, const TransformationParameters& parameters, const DataPoints& filteredReference, const DataPoints& reading, const Matches& matches, const OutlierWeights& outlierWeights, const TransformationCheckers& transformationCheckers);
+		virtual void dumpIteration(
+			const size_t iterationNumber, const TransformationParameters& parameters, const DataPoints& filteredReference, 
+			const DataPoints& reading, const Matches& matches, const OutlierWeights& outlierWeights, const TransformationCheckers& transformationCheckers);
+
+		virtual void dumpMatrix(std::vector<TransformationParameters> & m_v);
+
 		virtual void finish(const size_t iterationCount);
 	};
 	
